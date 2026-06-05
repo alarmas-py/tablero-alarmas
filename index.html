@@ -170,11 +170,69 @@
   ::-webkit-scrollbar { width:6px; height:6px; }
   ::-webkit-scrollbar-track { background:var(--surface); }
   ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+
+  /* ─── LOGIN ─── */
+  .login-overlay {
+    position: fixed; inset: 0; z-index: 999;
+    background: #0f1117;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .login-overlay.hidden { display: none; }
+  .login-box {
+    background: #1a1d27; border: 1px solid #2e3350;
+    border-radius: 16px; padding: 40px 36px; width: 360px;
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+  }
+  .login-logo { width: 52px; height: 52px; border-radius: 14px;
+    background: linear-gradient(135deg, #4f7cff, #6c4fff);
+    display: flex; align-items: center; justify-content: center; font-size: 26px; }
+  .login-box h2 { font-size: 18px; font-weight: 700; text-align: center; }
+  .login-box p { font-size: 12px; color: #7b82a0; text-align: center; margin-top: -12px; }
+  .login-field { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+  .login-field label { font-size: 12px; color: #7b82a0; font-weight: 500; }
+  .login-field input {
+    background: #22263a; border: 1px solid #2e3350;
+    border-radius: 8px; padding: 10px 14px;
+    color: #e8eaf0; font-size: 14px; outline: none; width: 100%;
+    transition: border-color .15s;
+  }
+  .login-field input:focus { border-color: #4f7cff; }
+  .login-btn {
+    width: 100%; background: linear-gradient(135deg, #4f7cff, #6c4fff);
+    color: #fff; border: none; border-radius: 8px;
+    padding: 11px; cursor: pointer; font-size: 14px; font-weight: 600;
+    transition: opacity .15s;
+  }
+  .login-btn:hover { opacity: .85; }
+  .login-error {
+    font-size: 12px; color: #ef4444; text-align: center;
+    background: #2d0a0a; border: 1px solid #7f1d1d;
+    border-radius: 8px; padding: 8px 14px; width: 100%; display: none;
+  }
+  .login-error.show { display: block; }
+
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
+
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="login-logo">🔒</div>
+    <h2>Tablero de Acciones</h2>
+    <p>Dirección Operativa · Alarmas PY</p>
+    <div class="login-field">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" placeholder="Ingresá la contraseña"
+             onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <div class="login-error" id="loginError">Contraseña incorrecta. Intentá de nuevo.</div>
+    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+  </div>
+</div>
+
 <div class="header">
   <div class="header-left">
     <div class="logo-dot">📋</div>
@@ -338,6 +396,33 @@
 </div>
 
 <script>
+
+// ─── LOGIN ───
+const SESSION_KEY = 'alarmaspy_auth';
+const PASSWORD    = 'alarmas2026';
+
+function doLogin() {
+  const val = document.getElementById('loginPass').value;
+  if (val === PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('loginOverlay').classList.add('hidden');
+    fetchActions();
+  } else {
+    document.getElementById('loginError').classList.add('show');
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+  }
+}
+
+function checkAuth() {
+  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    fetchActions();
+  } else {
+    setTimeout(() => document.getElementById('loginPass').focus(), 100);
+  }
+}
+
 // ─── CONFIG ───
 const URL_KEY    = 'alarmaspy_api_url';
 const CACHE_KEY  = 'alarmaspy_cache_v2';
@@ -643,7 +728,7 @@ document.getElementById('headerDate').textContent =
 
 // Banner siempre oculto — URL fija en el código
 document.getElementById('configBanner').classList.add('hidden');
-fetchActions();
+checkAuth();
 </script>
 </body>
 </html>
