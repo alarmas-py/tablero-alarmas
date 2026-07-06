@@ -13,6 +13,8 @@
     --amarillo: #f59e0b; --amarillo-bg: #2d1f00;
     --rojo: #ef4444; --rojo-bg: #2d0a0a;
     --gris: #64748b; --gris-bg: #1e2535;
+    --completado: #3b82f6; --completado-bg: #0c1c3d;
+    --descartado: #94a3b8; --descartado-bg: #23283a;
     --mkt: #ec4899; --ven: #4f7cff; --ops: #f59e0b; --atc: #22c55e; --adm: #a78bfa;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -107,11 +109,15 @@
   .semaforo.amarillo{ background:var(--amarillo-bg); color:var(--amarillo); }
   .semaforo.rojo    { background:var(--rojo-bg);     color:var(--rojo); }
   .semaforo.gris    { background:var(--gris-bg);     color:var(--gris); }
+  .semaforo.completado { background:var(--completado-bg); color:var(--completado); }
+  .semaforo.descartado { background:var(--descartado-bg); color:var(--descartado); text-decoration: line-through; }
   .dot { width:7px; height:7px; border-radius:50%; }
   .verde .dot    { background:var(--verde); }
   .amarillo .dot { background:var(--amarillo); }
   .rojo .dot     { background:var(--rojo); }
   .gris .dot     { background:var(--gris); }
+  .completado .dot { background:var(--completado); }
+  .descartado .dot { background:var(--descartado); }
 
   .prior { display:inline-block; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700; }
   .prior.alta  { background:#2d0a0a; color:#f87171; }
@@ -124,6 +130,7 @@
   .prog-fill.verde    { background:var(--verde); }
   .prog-fill.amarillo { background:var(--amarillo); }
   .prog-fill.rojo     { background:var(--rojo); }
+  .prog-fill.completado { background:var(--completado); }
   .prog-pct { font-size:12px; font-weight:600; min-width:34px; text-align:right; }
 
   .row-actions { display:flex; gap:6px; }
@@ -286,6 +293,8 @@
   <span class="chip" data-filter="estado" data-val="amarillo" onclick="setFilter('estado','amarillo',this)">⚠️ En riesgo</span>
   <span class="chip" data-filter="estado" data-val="rojo"     onclick="setFilter('estado','rojo',this)">🔴 Atrasado</span>
   <span class="chip" data-filter="estado" data-val="gris"     onclick="setFilter('estado','gris',this)">⏸ Pendiente</span>
+  <span class="chip" data-filter="estado" data-val="completado" onclick="setFilter('estado','completado',this)">🏁 Completado</span>
+  <span class="chip" data-filter="estado" data-val="descartado" onclick="setFilter('estado','descartado',this)">🗑️ Descartado</span>
 
   <div class="search-box">
     <span style="color:var(--text-muted)">🔍</span>
@@ -351,6 +360,8 @@
           <option value="verde">En tiempo</option>
           <option value="amarillo">En riesgo</option>
           <option value="rojo">Atrasado</option>
+          <option value="completado">Completado</option>
+          <option value="descartado">Descartado</option>
         </select>
       </div>
       <div class="form-group">
@@ -436,7 +447,7 @@ let sortKey      = 'id';
 let sortDir      = 1;
 
 const AREA_LABELS  = { mkt:'Marketing', ven:'Ventas', ops:'Operaciones', atc:'ATC', adm:'Administración' };
-const ESTADO_LABELS= { verde:'En tiempo', amarillo:'En riesgo', rojo:'Atrasado', gris:'Pendiente' };
+const ESTADO_LABELS= { verde:'En tiempo', amarillo:'En riesgo', rojo:'Atrasado', gris:'Pendiente', completado:'Completado', descartado:'Descartado' };
 const PRIOR_LABELS = { alta:'Alta', media:'Media', baja:'Baja' };
 const PRIOR_ORDER  = { alta:0, media:1, baja:2 };
 
@@ -558,7 +569,7 @@ function renderTable() {
   const today = new Date(); today.setHours(0,0,0,0);
   tbody.innerHTML = data.map(a => {
     const av = Number(a.avance) || 0;
-    const progColor = av >= 70 ? 'verde' : av >= 35 ? 'amarillo' : 'rojo';
+    const progColor = a.estado === 'completado' ? 'completado' : (av >= 70 ? 'verde' : av >= 35 ? 'amarillo' : 'rojo');
     let fechaClass = '';
     if (a.vencimiento) {
       const vd   = new Date(a.vencimiento + 'T00:00:00');
@@ -697,7 +708,7 @@ async function saveProgModal() {
   const val = parseInt(document.getElementById('pm_range').value);
   const idx = actions.findIndex(a => String(a.id) === String(progEditId));
   actions[idx].avance = val;
-  if (val === 100) actions[idx].estado = 'verde';
+  if (val === 100) actions[idx].estado = 'completado';
 
   const btn = document.getElementById('btnProgSave');
   btn.disabled = true; btn.textContent = 'Guardando…';
