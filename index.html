@@ -15,7 +15,7 @@
     --gris: #64748b; --gris-bg: #1e2535;
     --completado: #3b82f6; --completado-bg: #0c1c3d;
     --descartado: #94a3b8; --descartado-bg: #23283a;
-    --mkt: #ec4899; --ven: #4f7cff; --ops: #f59e0b; --atc: #22c55e; --adm: #a78bfa;
+    --mkt: #ec4899; --ven: #4f7cff; --ops: #f59e0b; --atc: #22c55e; --adm: #a78bfa; --bi: #06b6d4;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
@@ -84,6 +84,7 @@
   .chip.area-ops.active { border-color:var(--ops); color:var(--ops); background:#2a1f0a; }
   .chip.area-atc.active { border-color:var(--atc); color:var(--atc); background:#052e16; }
   .chip.area-adm.active { border-color:var(--adm); color:var(--adm); background:#1e1530; }
+  .chip.area-bi.active { border-color:var(--bi); color:var(--bi); background:#062a30; }
   .search-box { margin-left: auto; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; display: flex; align-items: center; gap: 8px; }
   .search-box input { background: none; border: none; outline: none; color: var(--text); font-size: 13px; width: 180px; }
   .search-box input::placeholder { color: var(--text-muted); }
@@ -103,6 +104,7 @@
   .area-pill.ops { background:#2a1f0a; color:var(--ops); }
   .area-pill.atc { background:#052e16; color:var(--atc); }
   .area-pill.adm { background:#1e1530; color:var(--adm); }
+  .area-pill.bi { background:#062a30; color:var(--bi); }
 
   .semaforo { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
   .semaforo.verde   { background:var(--verde-bg);   color:var(--verde); }
@@ -286,6 +288,7 @@
   <span class="chip area-ops" data-filter="area" data-val="ops" onclick="setFilter('area','ops',this)">Operaciones</span>
   <span class="chip area-atc" data-filter="area" data-val="atc" onclick="setFilter('area','atc',this)">ATC</span>
   <span class="chip area-adm" data-filter="area" data-val="adm" onclick="setFilter('area','adm',this)">Administración</span>
+  <span class="chip area-bi" data-filter="area" data-val="bi" onclick="setFilter('area','bi',this)">BI</span>
 
   <span style="margin-left:8px" class="filter-label">Estado:</span>
   <span class="chip active" data-filter="estado" data-val="all"      onclick="setFilter('estado','all',this)">Todos</span>
@@ -339,6 +342,7 @@
           <option value="ops">Operaciones Técnicas</option>
           <option value="atc">ATC / Customer Care</option>
           <option value="adm">Administración / Finanzas</option>
+          <option value="bi">BI / Analítica</option>
         </select>
       </div>
       <div class="form-group">
@@ -446,7 +450,7 @@ let filters      = { area: 'all', estado: 'all' };
 let sortKey      = 'id';
 let sortDir      = 1;
 
-const AREA_LABELS  = { mkt:'Marketing', ven:'Ventas', ops:'Operaciones', atc:'ATC', adm:'Administración' };
+const AREA_LABELS  = { mkt:'Marketing', ven:'Ventas', ops:'Operaciones', atc:'ATC', adm:'Administración', bi:'BI' };
 const ESTADO_LABELS= { verde:'En tiempo', amarillo:'En riesgo', rojo:'Atrasado', gris:'Pendiente', completado:'Completado', descartado:'Descartado' };
 const PRIOR_LABELS = { alta:'Alta', media:'Media', baja:'Baja' };
 const PRIOR_ORDER  = { alta:0, media:1, baja:2 };
